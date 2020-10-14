@@ -1,6 +1,8 @@
 <?php
 	require 'kanji.php';
 	
+	$KANJI = generate_kanji_grid();
+	
 	// Take a list of items and then create a list of lists of n items each.
 	function clumpify($items, $clump_size) {
 		$clumps = array();
@@ -43,9 +45,31 @@
 	echo '<style type="text/css">';
 	echo 'body { font-family: "Meiryo", serif; background-color:#' . $bgcolor . '; color:#' . $fgcolor . '; }';
 	echo '</style>';
+	?>
+
+<script>
+
+function show_meaning(slot, value) {
+	document.getElementById('meaning_slot_' + slot).innerHTML = value;
+}
+
+</script>
+	
+<?php
 	echo '</head>';
 	
 	echo '<body>';
+	
+	echo '<h2>Kanji Study Chart</h2>';
+	
+	echo '<form action="' . $_SERVER['REQUEST_URI'] . '" method="GET">';
+	echo '<div>';
+	echo 'Start: <input type="text" name="start" value="' . ($start + 1). '" size="3"/> &nbsp; ';
+	echo 'End: <input type="text" name="end" value="' . $end . '" size="3"/> &nbsp; ';
+	echo '<input type="submit" name="submit" value="Update">';
+	echo '</div>';
+	echo '</form>';
+	
 	echo '<table cellspacing="0" cellpadding="2">';
 	
 	$index = array();
@@ -57,15 +81,19 @@
 	shuffle($index);
 	
 	foreach ($index as $i) {
+		$n = $i + 1;
 		echo '<tr valign="top">';
-		echo '<td>#' . ($i + 1) . '</td>';
+		echo '<td>#' . $n . '</td>';
 		$clump = $clumps[$i];
 		shuffle($clump);
 		foreach ($clump as $value) {
 			echo '<td>';
-			echo htmlspecialchars($value);
+			echo '<span onclick="show_meaning(' . $n . ', &quot;' . htmlspecialchars($value['meaning']) . '&quot;)">';
+			echo htmlspecialchars($value['char']);
+			echo '</span>';
 			echo '</td>';
 		}
+		echo '<td><span style="margin-left:20px; color:#888;" id="meaning_slot_'. $n . '"></span></td>';
 		echo '</tr>';
 	}
 	echo '</table>';
